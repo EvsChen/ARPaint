@@ -40,7 +40,7 @@ class PointNode: SCNNode {
         super.init()
         
         let boxGeo = SCNBox(width: POINT_SIZE, height: POINT_HEIGHT * 2.0, length: POINT_SIZE, chamferRadius: 0.001)
-        boxGeo.firstMaterial?.diffuse.contents = UIColor.red
+        boxGeo.firstMaterial?.diffuse.contents = color
         
         let object = SCNNode(geometry: boxGeo)
         object.transform = SCNMatrix4MakeTranslation(0.0, Float(POINT_HEIGHT * 2.0) / 2.0, 0.0)

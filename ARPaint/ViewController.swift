@@ -150,6 +150,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             self.sceneView.scene.rootNode.addChildNode(self.virtualPenTip!)
         }
         
+        if (self.x_virtualPenTip == nil) {
+            self.x_virtualPenTip = PointNode(color: UIColor.blue)
+            self.sceneView.scene.rootNode.addChildNode(self.x_virtualPenTip!)
+        }
+        
         // Track the thumbnail
         guard let pixelBuffer = self.sceneView.session.currentFrame?.capturedImage,
             let observation = self.lastObservation else {
@@ -161,6 +166,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         request.trackingLevel = .accurate
         do {
             try self.handler.perform([request], on: pixelBuffer)
+        }
+        catch {
+            print(error)
+        }
+        
+        // Another finger
+        guard let x_pixelBuffer = self.sceneView.session.currentFrame?.capturedImage,
+            let x_observation = self.x_lastObservation else {
+                return
+        }
+        let x_request = VNTrackObjectRequest(detectedObjectObservation: x_observation) { [unowned self] x_request, error in
+            self.x_handle(x_request, error: error)
+        }
+        x_request.trackingLevel = .accurate
+        do {
+            try self.x_handler.perform([x_request], on: x_pixelBuffer)
         }
         catch {
             print(error)
@@ -193,6 +214,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 }
             }
             
+        }
+        
+        if let x_lastFingerWorldPos = self.x_lastFingerWorldPos {
+            self.x_virtualPenTip?.isHidden = false
+            self.x_virtualPenTip?.simdPosition = x_lastFingerWorldPos
         }
         
 	}
@@ -310,9 +336,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         inDrawMode = false
         in3DMode = false
         lastFingerWorldPos = nil
+        x_lastFingerWorldPos = nil
         drawButton.isSelected = false
         threeDMagicButton.isSelected = false
         self.virtualPenTip?.isHidden = true
+        self.x_virtualPenTip?.isHidden = true
         
 	}
 
@@ -376,21 +404,27 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var inDrawMode = false
     var in3DMode = false
     var lastFingerWorldPos: float3?
+    var x_lastFingerWorldPos: float3?
     
     var virtualPenTip: PointNode?
+    var x_virtualPenTip: PointNode?
     
     
     // MARK: Object tracking
     
     private var handler = VNSequenceRequestHandler()
+    private var x_handler = VNSequenceRequestHandler()
     fileprivate var lastObservation: VNDetectedObjectObservation?
+    fileprivate var x_lastObservation: VNDetectedObjectObservation?
     var trackImageBoundingBox: CGRect?
     var trackImageInitialOrigin: CGPoint?
     let trackImageSize = CGFloat(20)
     
+    
     @objc private func tapAction(recognizer: UITapGestureRecognizer) {
         
         handler = VNSequenceRequestHandler()
+        x_handler = VNSequenceRequestHandler()
         
         lastObservation = nil
         let tapLocation = recognizer.location(in: view)
@@ -410,6 +444,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         trackImageBoundingBoxInImage.origin.y = 1 - trackImageBoundingBoxInImage.origin.y   // Image space uses bottom left as origin while view space uses top left
         
         lastObservation = VNDetectedObjectObservation(boundingBox: trackImageBoundingBoxInImage)
+        if lastObservation != nil {
+            x_lastObservation = VNDetectedObjectObservation(boundingBox: trackImageBoundingBoxInImage)
+        }
         
     }
     
@@ -448,8 +485,37 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
-    
-    
-    
-    
+    fileprivate func x_handle(_ x_request: VNRequest, error: Error?) {
+        DispatchQueue.main.async {
+            guard let x_newObservation = x_request.results?.first as? VNDetectedObjectObservation else {
+                return
+            }
+            self.x_lastObservation = x_newObservation
+            
+            // check the confidence level before updating the UI
+            guard x_newObservation.confidence >= 0.3 else {
+                // hide the pen when we lose accuracy so the user knows something is wrong
+                self.x_virtualPenTip?.isHidden = true
+                self.x_lastObservation = nil
+                return
+            }
+            
+            var trackImageBoundingBoxInImage = x_newObservation.boundingBox
+            
+            // Transfrom the rect from image space to view space
+            trackImageBoundingBoxInImage.origin.y = 1 - trackImageBoundingBoxInImage.origin.y
+            guard let fromCameraImageToViewTransform = self.sceneView.session.currentFrame?.displayTransform(for: UIInterfaceOrientation.portrait, viewportSize: self.sceneView.frame.size) else {
+                return
+            }
+            let normalizedTrackImageBoundingBox = trackImageBoundingBoxInImage.applying(fromCameraImageToViewTransform)
+            let t = CGAffineTransform(scaleX: self.view.frame.size.width, y: self.view.frame.size.height)
+            let unnormalizedTrackImageBoundingBox = normalizedTrackImageBoundingBox.applying(t)
+            
+            // Get the projection if the location of the tracked image from image space to the nearest detected plane
+            
+            let trackImageOrigin = unnormalizedTrackImageBoundingBox.origin
+            (self.x_lastFingerWorldPos, _, _) = self.virtualObjectManager.worldPositionFromScreenPosition(CGPoint(x: trackImageOrigin.x - 20.0, y: trackImageOrigin.y + 40.0), in: self.sceneView, objectPos: nil, infinitePlane: false)
+            
+        }
+    }
 }
