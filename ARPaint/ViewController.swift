@@ -61,6 +61,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         trackImageInitialOrigin = nil
     }
     
+    @IBOutlet weak var drawRectButton: UIButton!
+    @IBAction func drawRectButton(_ button: UIButton) {
+        drawRectButton.isSelected = !drawRectButton.isSelected
+        inDrawRect = drawRectButton.isSelected
+    }
+    
     // MARK: - Queues
     
     static let serialQueue = DispatchQueue(label: "com.apple.arkitexample.serialSceneKitQueue")
@@ -71,17 +77,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
 		setupUIControls()
         setupScene()
-        
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAction))
         view.addGestureRecognizer(tapGestureRecognizer)
     }
 
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
 		// Prevent the screen from being dimmed after a while.
 		UIApplication.shared.isIdleTimerDisabled = true
 		
@@ -105,7 +108,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
 	func setupScene() {
 		virtualObjectManager = VirtualObjectManager()
-		
 		// set up scene view
 		sceneView.setup()
 		sceneView.delegate = self
@@ -131,18 +133,32 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         messageLabel.text = ""
     }
 	
+    var inititalDistance: Float?;
+    var currentDistance: Float?;
+    
+    @IBAction func drawRect(_ button: UIButton) {
+        if (!self.inDrawRect) {return}
+        if let pos1 = self.lastFingerWorldPos, let pos2 = self.x_lastFingerWorldPos {
+            let newRect = RectNode()
+            self.sceneView.scene.rootNode.addChildNode(newRect)
+            let midPoint = (pos1 + pos2)/2
+            self.virtualObjectManager.loadRect(newRect, to: midPoint)
+            newRect.select()
+            self.setInitialDistance()
+        }
+    }
+    
     // MARK: - ARSCNViewDelegate
-	
 	func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
 		updateFocusSquare()
-		
-		// If light estimation is enabled, update the intensity of the model's lights and the environment map
-		if let lightEstimate = self.session.currentFrame?.lightEstimate {
-			self.sceneView.scene.enableEnvironmentMapWithIntensity(lightEstimate.ambientIntensity / 40, queue: serialQueue)
-		} else {
-			self.sceneView.scene.enableEnvironmentMapWithIntensity(40, queue: serialQueue)
-		}
-        
+//
+//        // If light estimation is enabled, update the intensity of the model's lights and the environment map
+//        if let lightEstimate = self.session.currentFrame?.lightEstimate {
+//            self.sceneView.scene.enableEnvironmentMapWithIntensity(lightEstimate.ambientIntensity / 40, queue: serialQueue)
+//        } else {
+//            self.sceneView.scene.enableEnvironmentMapWithIntensity(40, queue: serialQueue)
+//        }
+//
         
         // Setup a dot that represents the virtual pen's tippoint
         if (self.virtualPenTip == nil) {
@@ -202,7 +218,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             }
             
             // Convert drawing to 3D
-            if (self.in3DMode ) {
+            if (self.in3DMode) {
                 if self.trackImageInitialOrigin != nil {
                     DispatchQueue.main.async {
                         let newH = 0.4 *  (self.trackImageInitialOrigin!.y - self.trackImageBoundingBox!.origin.y) / self.sceneView.frame.height
@@ -219,6 +235,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if let x_lastFingerWorldPos = self.x_lastFingerWorldPos {
             self.x_virtualPenTip?.isHidden = false
             self.x_virtualPenTip?.simdPosition = x_lastFingerWorldPos
+        }
+        
+        // extend the rect
+        if (self.virtualObjectManager.rectNodes.count == 0) {return}
+        let rect = self.virtualObjectManager.rectNodes[0]
+        if (!rect.isSelected) {return}
+        if let pos1 = self.lastFingerWorldPos, let pos2 = self.x_lastFingerWorldPos {
+            self.currentDistance = distance(pos1, pos2)
+            if let dist1 = self.inititalDistance, let dist2 = self.currentDistance {
+                let size = (dist2 / dist1) * (dist2 / dist1)
+                rect.setToTime(size)
+                print("size", size)
+            }
         }
         
 	}
@@ -403,6 +432,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     var inDrawMode = false
     var in3DMode = false
+    var inDrawRect = false
     var lastFingerWorldPos: float3?
     var x_lastFingerWorldPos: float3?
     
@@ -420,8 +450,26 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var trackImageInitialOrigin: CGPoint?
     let trackImageSize = CGFloat(20)
     
+    func setInitialDistance() -> Void {
+        if let pos1 = self.lastFingerWorldPos, let pos2 = self.x_lastFingerWorldPos {
+            self.inititalDistance = distance(pos1, pos2)
+        }
+    }
+    
     
     @objc private func tapAction(recognizer: UITapGestureRecognizer) {
+        print("node count", self.virtualObjectManager.rectNodes.count)
+        if (self.virtualObjectManager.rectNodes.count > 0) {
+            let tapLocation = recognizer.location(in: view)
+            let (worldPos, _, _) = self.virtualObjectManager.worldPositionFromScreenPosition(tapLocation, in: self.sceneView, objectPos: nil, infinitePlane: false)
+            let rect = self.virtualObjectManager.rectNodes[0]
+            if let pos = worldPos {
+                if (self.virtualObjectManager.rectNodeContains(rect: rect, pos: pos)){
+                    rect.unselect()
+                }
+            }
+            return;
+        }
         
         handler = VNSequenceRequestHandler()
         x_handler = VNSequenceRequestHandler()
@@ -499,7 +547,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 self.x_lastObservation = nil
                 return
             }
-            
+            // TODO: extract the bounding box part to be a function
             var trackImageBoundingBoxInImage = x_newObservation.boundingBox
             
             // Transfrom the rect from image space to view space

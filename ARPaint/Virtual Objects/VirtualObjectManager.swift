@@ -13,15 +13,20 @@ class VirtualObjectManager {
 	weak var delegate: VirtualObjectManagerDelegate?
 	
 	var pointNodes = [PointNode]()
+    var rectNodes = [RectNode]()
 	
 	func removeAllVirtualObjects() {
 		for object in pointNodes {
 			unloadVirtualObject(object)
 		}
+        for object in rectNodes {
+            unloadVirtualObject(object)
+        }
 		pointNodes.removeAll()
+        rectNodes.removeAll()
 	}
 	
-	private func unloadVirtualObject(_ object: PointNode) {
+	private func unloadVirtualObject(_ object: SCNNode) {
 		ViewController.serialQueue.async {
 			object.removeFromParentNode()
 		}
@@ -30,10 +35,16 @@ class VirtualObjectManager {
 	// MARK: - Loading object
 	
     func loadVirtualObject(_ object: PointNode, to position: float3) {
-		self.pointNodes.append(object)
+		pointNodes.append(object)
 		self.delegate?.virtualObjectManager(self, willLoad: object)
         object.simdPosition = position
 	}
+    
+    func loadRect(_ object: RectNode, to position: float3) {
+        rectNodes.append(object)
+        self.delegate?.virtualObjectManager(self, willLoad: object)
+        object.simdPosition = position
+    }
     
     func pointNodeExistAt(pos: float3) -> Bool {
         
@@ -55,6 +66,22 @@ class VirtualObjectManager {
             if (distance < (nodeLengthInWorld / 2.0)){
                 return true
             }
+        }
+        
+        return false
+    }
+    
+    func rectNodeContains(rect: RectNode, pos: float3) -> Bool {
+        let (v1, v2) = rect.getChildBoundingBox()
+        let parent = rect.parent
+        
+        let nodeLengthInWorld = (
+            rect.convertPosition(SCNVector3(v1.x - v2.x, 0, v1.z - v2.z), to: parent) - rect.convertPosition(SCNVector3(0, 0, 0), to: parent)
+            ).length()
+        
+        let distance = (rect.simdPosition - pos).length()
+        if (distance < (nodeLengthInWorld / 2.0)){
+            return true
         }
         
         return false
@@ -187,6 +214,7 @@ class VirtualObjectManager {
 // MARK: - Delegate
 
 protocol VirtualObjectManagerDelegate: class {
+    func virtualObjectManager(_ manager: VirtualObjectManager, willLoad object: RectNode)
 	func virtualObjectManager(_ manager: VirtualObjectManager, willLoad object: PointNode)
 	func virtualObjectManager(_ manager: VirtualObjectManager, didLoad object: PointNode)
 	func virtualObjectManager(_ manager: VirtualObjectManager, transformDidChangeFor object: PointNode)
