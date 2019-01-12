@@ -21,39 +21,6 @@
                             <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="E6c-py-dvH" customClass="ARSCNView">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </sceneKitView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FDz-qT-5Mj" userLabel="Draw Button">
-                                <rect key="frame" x="16" y="604" width="120" height="48"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="48" id="L76-M7-2Ss"/>
-                                    <constraint firstAttribute="width" constant="120" id="q6S-Bh-mXP"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
-                                <state key="normal" title=" Draw" image="shutter">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <color key="titleShadowColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <state key="selected" image="shutterPressed"/>
-                                <state key="highlighted" image="shutterPressed"/>
-                                <connections>
-                                    <action selector="drawAction" destination="BV1-FR-VrT" eventType="touchUpInside" id="zb8-0r-w0o"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yf6-WU-CVx" userLabel="3D Button">
-                                <rect key="frame" x="166" y="604" width="120" height="48"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="48" id="dES-Xv-vf4"/>
-                                    <constraint firstAttribute="width" constant="120" id="tF1-4K-EQ2"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
-                                <state key="normal" title=" 3D!" image="shutter">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <state key="selected" image="shutterPressed"/>
-                                <state key="highlighted" image="shutterPressed"/>
-                                <connections>
-                                    <action selector="threeDMagicAction:" destination="BV1-FR-VrT" eventType="touchUpInside" id="pmd-MP-Yuj"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SuF-Os-zmb" userLabel="Restart Experience Button Hit Area">
                                 <rect key="frame" x="345" y="0.0" width="30" height="90"/>
                                 <constraints>
@@ -131,37 +98,71 @@
                                     <action selector="drawRectButton:" destination="BV1-FR-VrT" eventType="touchUpInside" id="2OW-yZ-Cll"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JTg-3e-3rt">
+                                <rect key="frame" x="45" y="617" width="42" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Sizing">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="sizingButtonAction:" destination="BV1-FR-VrT" eventType="touchUpInside" id="uYa-dG-au1"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7la-Bt-eQc">
+                                <rect key="frame" x="164" y="617" width="46" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Draw">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="drawAction" destination="BV1-FR-VrT" eventType="touchUpInside" id="np6-u0-ome"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xpj-IC-yZJ">
+                                <rect key="frame" x="284" y="617" width="30" height="30"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="3D">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="threeDMagicAction:" destination="BV1-FR-VrT" eventType="touchUpInside" id="mZm-4B-Ohz"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="FDz-qT-5Mj" firstAttribute="leading" secondItem="GBj-4O-Whc" secondAttribute="leading" constant="16" id="05U-lG-lP4"/>
-                            <constraint firstItem="E6c-py-dvH" firstAttribute="top" secondItem="sna-Uv-k2v" secondAttribute="bottom" constant="-200" id="0YB-Ko-F67"/>
+                            <constraint firstItem="E6c-py-dvH" firstAttribute="top" secondItem="sna-Uv-k2v" secondAttribute="bottom" constant="-202" id="0YB-Ko-F67"/>
+                            <constraint firstItem="xpj-IC-yZJ" firstAttribute="leading" secondItem="E6c-py-dvH" secondAttribute="trailing" constant="-91" id="2R3-qQ-4be"/>
                             <constraint firstItem="SuF-Os-zmb" firstAttribute="trailing" secondItem="E6c-py-dvH" secondAttribute="trailing" id="35g-18-nn3"/>
-                            <constraint firstItem="GBj-4O-Whc" firstAttribute="bottom" secondItem="Yf6-WU-CVx" secondAttribute="bottom" constant="15" id="3bn-1I-b3Y"/>
                             <constraint firstItem="BgI-fb-Vqi" firstAttribute="trailing" secondItem="E6c-py-dvH" secondAttribute="trailing" constant="-15" id="6c1-k7-y99"/>
                             <constraint firstAttribute="bottom" secondItem="E6c-py-dvH" secondAttribute="bottom" id="6h6-BI-mhL"/>
                             <constraint firstItem="E6c-py-dvH" firstAttribute="top" secondItem="RLh-bf-1c3" secondAttribute="top" id="7gH-DS-Crg"/>
                             <constraint firstItem="E6c-py-dvH" firstAttribute="leading" secondItem="GBj-4O-Whc" secondAttribute="leading" id="8nh-ZQ-AuM"/>
                             <constraint firstItem="9e0-zv-RiN" firstAttribute="top" secondItem="E6c-py-dvH" secondAttribute="top" constant="15" id="FTS-AH-WBr"/>
+                            <constraint firstItem="xpj-IC-yZJ" firstAttribute="leading" secondItem="7la-Bt-eQc" secondAttribute="trailing" constant="74" id="Fpo-QN-er0"/>
                             <constraint firstItem="BgI-fb-Vqi" firstAttribute="leading" secondItem="9e0-zv-RiN" secondAttribute="trailing" constant="15" id="MwJ-LS-qaQ"/>
                             <constraint firstItem="E6c-py-dvH" firstAttribute="leading" secondItem="sna-Uv-k2v" secondAttribute="trailing" constant="-116" id="SAq-Ya-EQb"/>
+                            <constraint firstItem="xpj-IC-yZJ" firstAttribute="top" secondItem="E6c-py-dvH" secondAttribute="bottom" constant="-50" id="Sb5-jS-SGz"/>
                             <constraint firstItem="SuF-Os-zmb" firstAttribute="top" secondItem="E6c-py-dvH" secondAttribute="top" id="UMK-or-VVf"/>
                             <constraint firstItem="BgI-fb-Vqi" firstAttribute="top" secondItem="GBj-4O-Whc" secondAttribute="top" constant="20" id="V7S-nn-Lcz"/>
-                            <constraint firstItem="GBj-4O-Whc" firstAttribute="bottom" secondItem="FDz-qT-5Mj" secondAttribute="bottom" constant="15" id="eum-Td-wmw"/>
+                            <constraint firstItem="7la-Bt-eQc" firstAttribute="leading" secondItem="JTg-3e-3rt" secondAttribute="trailing" constant="77" id="dJL-h5-Pd0"/>
+                            <constraint firstItem="JTg-3e-3rt" firstAttribute="top" secondItem="E6c-py-dvH" secondAttribute="bottom" constant="-50" id="gHH-iO-Pq8"/>
                             <constraint firstItem="9e0-zv-RiN" firstAttribute="leading" secondItem="E6c-py-dvH" secondAttribute="leading" constant="15" id="iIf-WZ-kZj"/>
-                            <constraint firstItem="Yf6-WU-CVx" firstAttribute="leading" secondItem="FDz-qT-5Mj" secondAttribute="trailing" constant="30" id="iaw-eF-9bI"/>
                             <constraint firstItem="GBj-4O-Whc" firstAttribute="trailing" secondItem="E6c-py-dvH" secondAttribute="trailing" id="lHd-lf-g1u"/>
+                            <constraint firstItem="E6c-py-dvH" firstAttribute="leading" secondItem="JTg-3e-3rt" secondAttribute="trailing" constant="-87" id="qkg-QA-23T"/>
+                            <constraint firstItem="7la-Bt-eQc" firstAttribute="top" secondItem="E6c-py-dvH" secondAttribute="bottom" constant="-50" id="xZ1-oG-Sxc"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="GBj-4O-Whc"/>
                     </view>
                     <connections>
-                        <outlet property="drawButton" destination="FDz-qT-5Mj" id="iGR-n3-bSc"/>
+                        <outlet property="drawButton" destination="7la-Bt-eQc" id="1hr-TV-bk4"/>
                         <outlet property="drawRectButton" destination="sna-Uv-k2v" id="N24-d6-EPz"/>
                         <outlet property="messageLabel" destination="Mqz-65-rAs" id="G3a-qn-5g9"/>
                         <outlet property="messagePanel" destination="9e0-zv-RiN" id="pKf-hp-Dvx"/>
                         <outlet property="restartExperienceButton" destination="BgI-fb-Vqi" id="Yfh-W4-qlO"/>
                         <outlet property="sceneView" destination="E6c-py-dvH" id="Gr4-Uw-Z4A"/>
-                        <outlet property="threeDMagicButton" destination="Yf6-WU-CVx" id="r25-7i-VdB"/>
+                        <outlet property="sizingButton" destination="JTg-3e-3rt" id="8fN-D4-RyK"/>
+                        <outlet property="threeDMagicButton" destination="xpj-IC-yZJ" id="Xjv-Zv-0I6"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
@@ -173,6 +174,5 @@
         <image name="restart" width="20" height="23"/>
         <image name="restartPressed" width="20" height="23"/>
         <image name="shutter" width="48" height="48"/>
-        <image name="shutterPressed" width="96" height="96"/>
     </resources>
 </document>

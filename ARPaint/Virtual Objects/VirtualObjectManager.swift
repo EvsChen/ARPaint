@@ -92,6 +92,11 @@ class VirtualObjectManager {
             for pointNode in self.pointNodes {
                 pointNode.setNewHeight(newHeight: newHeight)
             }
+            for rectNode in self.rectNodes {
+                if (rectNode.isSelected) {
+                    rectNode.setNewHeight(newHeight: newHeight)
+                }
+            }
         }
     }
     

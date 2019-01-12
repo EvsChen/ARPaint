@@ -61,19 +61,16 @@ class RectNode: SCNNode {
     
     
     func select() -> Void {
-        self.opacity = 0.5
-        self.isSelected = true
-        
-    }
-    
-    func unselect() -> Void {
-        self.isSelected = false
-        self.opacity = 1
         self.originWidth = RectNode.boxGeo?.width
         self.originLength = RectNode.boxGeo?.length
+        if (self.isSelected) {
+            self.isSelected = false
+            self.opacity = 1
+            return
+        }
+        self.opacity = 0.5
+        self.isSelected = true
     }
-    
-    
     
     func setNewHeight(newHeight: CGFloat) {
         RectNode.boxGeo?.height = newHeight
